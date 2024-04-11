@@ -42,7 +42,7 @@ $ShortCut.Save()
 ######################################################################
 if ($Installedstatus -eq 'True') {
   Write-Host "Fishbanks is installed, Removing..."
-  Remove-Item "C:\Users\Public\Desktop\MIT Fishbanks Software.lnk"
+  Remove-Item "$Destination$URLTitle.lnk"
   Write-Host "Fishbanks has been Removed."
   start-sleep 3
   exit
