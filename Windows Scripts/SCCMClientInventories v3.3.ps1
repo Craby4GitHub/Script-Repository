@@ -31,7 +31,7 @@ gpupdate /force
 $wirelesNetworkAdapters = Get-NetAdapter -Physical -name "Wi*Fi*"
 if ($null -ne $wirelesNetworkAdapters) {
   Write-Host "==== Connect to PimaDot1x ====" -ForegroundColor Red -BackgroundColor White
-  netsh wlan add profile filename=$PSScriptRoot\Wi-Fi-PimaDot1X.xml
+  netsh wlan add profile filename=$PSScriptRoot\Wi-Fi-PCC ACCESS.xml
   netsh wlan connect name=PimaDot1X
   Start-Sleep -Seconds 5
 }
