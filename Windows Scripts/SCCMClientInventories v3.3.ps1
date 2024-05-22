@@ -23,17 +23,41 @@ if ($computername.Name -notmatch "^(?<Campus>([a-z]{2,3}|\d{2}))(?<Dash>-?)(?<Bu
   )
 }
 
+# Define the paths to the Group Policy directories
+$gpPath = "C:\Windows\System32\GroupPolicy"
+$gpUsersPath = "C:\Windows\System32\GroupPolicyUsers"
+
+# Clear the Group Policy directories
+if (Test-Path $gpPath) {
+    Get-ChildItem -Path $gpPath -Recurse -Force | Remove-Item -Recurse -Force
+    Write-Host "Cleared contents of $gpPath"
+}
+
+if (Test-Path $gpUsersPath) {
+    Get-ChildItem -Path $gpUsersPath -Recurse -Force | Remove-Item -Recurse -Force
+    Write-Host "Cleared contents of $gpUsersPath"
+}
+
 # Force a Group Policy update
 Write-Host "==== Starting GPUpdate ====" -ForegroundColor Red -BackgroundColor White
 gpupdate /force
 
 # Look for a Wi-Fi adapter and if found, connect to the PimaDot1x Wi-Fi network.
 $wirelesNetworkAdapters = Get-NetAdapter -Physical -name "Wi*Fi*"
-if ($null -ne $wirelesNetworkAdapters) {
+$profileFilePath = "$PSScriptRoot\Wi-Fi-PCC ACCESS.xml"
+
+if ($null -ne $wirelesNetworkAdapters -and (Test-Path -Path $profileFilePath)) {
   Write-Host "==== Connect to PimaDot1x ====" -ForegroundColor Red -BackgroundColor White
-  netsh wlan add profile filename=$PSScriptRoot\Wi-Fi-PCC ACCESS.xml
+  netsh wlan add profile filename=$profileFilePath
   netsh wlan connect name=PimaDot1X
   Start-Sleep -Seconds 5
+} else {
+  if ($null -eq $wirelesNetworkAdapters) {
+    Write-Host "No wireless network adapters found." -ForegroundColor Yellow
+  }
+  if (-not (Test-Path -Path $profileFilePath)) {
+    Write-Host "Profile file not found: $profileFilePath" -ForegroundColor Yellow
+  }
 }
 
 # Setup Config Manager hash table to be used to run cycles
